@@ -10,5 +10,6 @@ Gem::Specification.new do |s|
   s.description = 'Carnivore Unix Socket Source'
   s.require_path = 'lib'
   s.add_dependency 'carnivore', '>= 0.1.8'
+  s.add_dependency 'celluloid-io'
   s.files = Dir['**/*']
 end
