@@ -38,7 +38,7 @@ module Carnivore
             line.strip
           else
             io.close
-            teminate
+            terminate
           end
         end
 
