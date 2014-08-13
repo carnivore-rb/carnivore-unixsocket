@@ -1,3 +1,4 @@
+require 'carnivore-unixsocket'
 require 'celluloid/io'
 
 module Carnivore

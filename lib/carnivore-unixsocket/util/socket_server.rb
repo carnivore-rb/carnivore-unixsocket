@@ -1,5 +1,5 @@
+require 'carnivore-unixsocket'
 require 'celluloid/io'
-require 'carnivore-unixsocket/util/socket_connection'
 
 module Carnivore
   module UnixSocket
