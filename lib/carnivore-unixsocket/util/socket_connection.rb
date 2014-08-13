@@ -1,5 +1,4 @@
 require 'carnivore-unixsocket'
-require 'celluloid/io'
 
 module Carnivore
   module UnixSocket
@@ -28,7 +27,7 @@ module Carnivore
           end
         end
 
-        def send(s)
+        def write_line(s)
           io.puts s
           io.flush
         end

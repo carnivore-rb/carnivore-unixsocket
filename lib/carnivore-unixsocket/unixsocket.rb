@@ -30,10 +30,10 @@ module Carnivore
         callback_supervisor[srv_name]
       end
 
-      # @return [Celluloid::IO::UnixSocket]
+      # @return [Celluloid::IO::UNIXSocket]
       def connection
         unless(@connection)
-          @connection = Celluloid::IO::UnixSocket.new(socket)
+          @connection = Celluloid::IO::UNIXSocket.new(socket)
         end
         @connection
       end
@@ -55,7 +55,14 @@ module Carnivore
       # Receive messages
       def receive(*args)
         wait(:new_socket_lines)
-        server.return_lines
+        server.return_lines.map do |line|
+          puts "LOADING LINE: #{line.inspect}"
+          begin
+            MultiJson.load(line)
+          rescue MultiJson::ParseError
+            line
+          end
+        end
       end
 
       # Send message
@@ -63,7 +70,9 @@ module Carnivore
       # @param payload [Object]
       # @param original_message [Carnivore::Message]
       def transmit(payload, original_message=nil)
-        connection.write_line(payload)
+        output = payload.is_a?(String) ? payload : MultiJson.dump(payload)
+        connection.puts(output)
+        connection.flush
       end
 
       # Override processing to enable server only if required
