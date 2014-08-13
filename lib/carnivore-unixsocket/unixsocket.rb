@@ -56,7 +56,6 @@ module Carnivore
       def receive(*args)
         wait(:new_socket_lines)
         server.return_lines.map do |line|
-          puts "LOADING LINE: #{line.inspect}"
           begin
             MultiJson.load(line)
           rescue MultiJson::ParseError
