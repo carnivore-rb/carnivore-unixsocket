@@ -18,6 +18,8 @@ module Carnivore
         attr_reader :source
         # @return [IO]
         attr_reader :waker
+        # @return [Array<IO>]
+        attr_reader :connections
 
         # Create a new server
         #

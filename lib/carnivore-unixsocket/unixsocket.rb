@@ -40,7 +40,7 @@ module Carnivore
 
       # Initialize the server
       def init_srv
-        @server = Util::Server.new(
+        @server = Carnivore::UnixSocket::Util::Server.new(
           :path => socket,
           :source => current_self
         )
