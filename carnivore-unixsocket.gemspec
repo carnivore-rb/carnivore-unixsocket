@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.description = 'Carnivore Unix Socket Source'
   s.license = 'Apache 2.0'
   s.require_path = 'lib'
-  s.add_dependency 'carnivore', '>= 0.1.8'
-  s.files = Dir['**/*']
+  s.add_dependency 'carnivore', '>= 1.0'
+  s.files = Dir['lib/**/*'] + %w(carnivore-unixsocket.gemspec README.md CHANGELOG.md)
 end

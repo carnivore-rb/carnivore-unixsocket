@@ -10,7 +10,7 @@ require 'carnivore-unixsocket'
 
 Carnivore.configure do
   source = Carnivore::Source.build(
-    :type => :socket, :args => {:path => '/var/run/my.sock'}
+    :type => :unix_socket, :args => {:path => '/var/run/my.sock'}
   )
 end
 ```
