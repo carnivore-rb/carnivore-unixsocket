@@ -1,4 +1,3 @@
-require 'celluloid/io'
 require 'carnivore'
 
 module Carnivore

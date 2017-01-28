@@ -5,8 +5,7 @@ module Carnivore
     # Unix socket based carnivore source
     class UnixSocket < Source
 
-      # max time for unix socket to setup
-      INIT_SRV_TIMEOUT = 2.0
+      option :cache_signals
 
       # @return [String] path to socket
       attr_reader :socket
@@ -19,6 +18,7 @@ module Carnivore
       #
       # @param args [Hash]
       def setup(args={})
+        @write_lock = Mutex.new
         @socket = ::File.expand_path(args[:path])
         @srv_name = "socket_srv_#{name}".to_sym
         @connection = nil
@@ -27,40 +27,34 @@ module Carnivore
 
       # @return [Util::Server]
       def server
-        callback_supervisor[srv_name]
+        @server
       end
 
       # @return [Celluloid::IO::UNIXSocket]
       def connection
         unless(@connection)
-          @connection = Celluloid::IO::UNIXSocket.new(socket)
+          @connection = UNIXSocket.new(socket)
         end
         @connection
       end
 
       # Initialize the server
       def init_srv
-        callback_supervisor.supervise_as(srv_name,
-          Carnivore::UnixSocket::Util::Server,
-          init_args.merge(:notify_actor => current_actor)
+        @server = Util::Server.new(
+          :path => socket,
+          :source => current_self
         )
-        waited = 0.0
-        until(server || waited > INIT_SRV_TIMEOUT)
-          sleep(0.01)
-          waited += 0.01
-        end
-        server.async.start
+        @server.async.start_collector!
+        @server.async.start_server!
       end
 
       # Receive messages
       def receive(*args)
-        wait(:new_socket_lines)
-        server.return_lines.map do |line|
-          begin
-            MultiJson.load(line)
-          rescue MultiJson::ParseError
-            line
-          end
+        line = wait(:message)
+        begin
+          MultiJson.load(line)
+        rescue MultiJson::ParseError
+          line
         end
       end
 
@@ -70,8 +64,12 @@ module Carnivore
       # @param original_message [Carnivore::Message]
       def transmit(payload, original_message=nil)
         output = payload.is_a?(String) ? payload : MultiJson.dump(payload)
-        connection.puts(output)
-        connection.flush
+        @write_lock.synchronize do
+          defer do
+            connection.puts(output)
+            connection.flush
+          end
+        end
       end
 
       # Override processing to enable server only if required

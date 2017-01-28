@@ -11,6 +11,5 @@ Gem::Specification.new do |s|
   s.license = 'Apache 2.0'
   s.require_path = 'lib'
   s.add_dependency 'carnivore', '>= 0.1.8'
-  s.add_dependency 'celluloid-io'
   s.files = Dir['**/*']
 end
